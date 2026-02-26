@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Holi Wishes | ANKKU DII</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Sans+Devanagari:wght@400;700&family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; background: #050505; color: white; font-family: 'Poppins', sans-serif; overflow-x: hidden; touch-action: manipulation; }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 { font-size: clamp(2.2rem, 10vw, 5.5rem); margin: 0; font-weight: 800; text-transform: uppercase; line-height: 1.1; }
+        .gold-gradient { 
+            background: linear-gradient(45deg, #ffd700, #ff007f, #7a00ff); 
+            background-size: 200% auto;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        
+        #message-overlay, #video-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 100px 20px 60px 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #video-overlay {
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.95);
+            z-index: 10001;
+        }
+
+        .hindi-line {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            color: #ffd700;
+            line-height: 1.6;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .osho-quote {
+            color: #00e5ff !important;
+            font-style: italic;
+            border-left: 4px solid #ff007f;
+            padding-left: 15px;
+            text-align: left;
+            margin: 25px 0;
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .virus-box {
+            border: 2px dashed #ff007f;
+            background: rgba(255, 0, 127, 0.08);
+            padding: 35px 20px;
+            border-radius: 20px;
+            margin: 40px auto;
+            max-width: 500px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.2);
+        }
+
+        .virus-box::before {
+            content: "⚠️ CRITICAL SYSTEM WARNING";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff007f;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .msg-btn {
+            background: #ffd700;
+            color: black;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .msg-btn:active { transform: scale(0.95); }
+        
+        .btn-pink { background: #ff007f; color: white; box-shadow: 0 10px 30px rgba(255, 0, 127, 0.3); }
+        .btn-blue { background: #00e5ff; color: black; box-shadow: 0 10px 30px rgba(0, 229, 255, 0.3); }
+
+        .close-btn {
+            position: fixed;
+            top: 20px; right: 25px;
+            color: #ffd700; font-size: 3rem;
+            cursor: pointer; z-index: 10002;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .emoji-sad {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg"></canvas>
+    
+    <audio id="bgMusic" loop preload="auto">
+        <source src="krishana.mp3" type="audio/mpeg">
+    </audio>
+
+    <section id="main-hero">
+        <div class="emoji-sad" style="top:10%; left:20%;">😔</div>
+        <div class="emoji-sad" style="bottom:20%; right:15%;">🥀</div>
+        <p style="letter-spacing: 5px; font-weight: 300;">DEAREST MITTAR</p>
+        <h1 class="reveal">HAPPY <br> <span class="gold-gradient">ADVANCE HOLI</span> <br> ANNU</h1>
+        
+        <div class="btn-container">
+            <button class="msg-btn" id="openBtn" onclick="showMsg()">ज़िंदगी और उत्सव 🌸</button>
+            <button class="msg-btn btn-pink" onclick="playVideo('ASK.mp4')">CLICK ANNU</button>
+            <button class="msg-btn btn-blue" onclick="playVideo('miss.mp4')">CLICK ANNU</button>
+        </div>
+    </section>
+
+    <section id="virus-section">
+        <div class="virus-box reveal">
+            <p style="line-height: 1.8; font-size: 1.15rem;">
+                तू चाहे दीवार बना ले या ब्लॉक की लिस्ट,<br>
+                मैं तो वो <b style="color:#ff007f;">'वायरस'</b> हूँ जो तेरे ख्यालों में भी घुस जाऊँगा।<br><br>
+                अन्नू, तूने मुझे ब्लॉक किया है, मेरे दिल को नहीं। ❤️<br><br>
+                <span style="color: #00e5ff; font-style: italic;">"मेरे पास एक आईडिया तेरी ब्लॉक का बायपास है, मैं मैसेज करूँगा ky bol ... हाहाहा!"</span> 😎🔥<br><br>
+                और हाँ, <b style="color:#ffd700;">अनब्लॉक कर दे</b> वरना तेरे घर के बाहर आकर 'अन्नू-अन्नू' चिल्लाऊँगा! 😂📢
+            </p>
+        </div>
+    </section>
+
+    <div id="message-overlay">
+        <div class="close-btn" onclick="closeMsg()">&times;</div>
+        
+        <div class="hindi-line osho-quote">
+            <strong>ज़िंदगी और उत्सव</strong><br>
+            "ज़िंदगी कोई समस्या नहीं है जिसे सुलझाना हो, यह एक रहस्य है जिसे जीकर ही जाना जा सकता है। मत पूछ मंज़िल कहाँ है, बस हर कदम को उत्सव बना ले।"
+        </div>
+
+        <div class="hindi-line">मैं कोई खास बनने की कोशिश नहीं करता, बस जैसा हूँ वैसा ही रहता हूँ। 😔</div>
+        <div class="hindi-line">दिखावे की आदत नहीं, और झूठे चेहरों से दूरी पसंद है।</div>
+        
+        <div class="hindi-line osho-quote">
+            <strong>वर्तमान का महत्व</strong><br>
+            "जो बीत गया वो सपना है, जो आने वाला है वो कल्पना है, बस यही 'पल' अपना है। साँस को देखो, यही तुम्हारा मंदिर है, यही तुम्हारा परमात्मा है।"
+        </div>
+
+        <div class="hindi-line">दुनिया क्या कहती है, इससे ज़्यादा मुझे अपनी ख़ामोशी सुकून देती है। 😶</div>
+        <div class="hindi-line">हाँ... हँस लेता हूँ, मस्ती भी करता हूँ, दिल खोलकर जीना जानता हूँ।</div>
+        <div class="hindi-line">जिससे जुड़ता हूँ, सच्चे दिल से जुड़ता हूँ... 🥀</div>
+        <div class="hindi-line">दुनियादारी की चालाकियों से खुद को बचाकर चलता हूँ।</div>
+        <div class="hindi-line">शायद इसी वजह से हर किसी को अच्छा नहीं लगता, मगर जो समझ जाते हैं मुझे... 🥺</div>
+
+        <div class="hindi-line" style="font-weight: bold; font-size: 1.4rem; color: #ff007f; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: center;">
+            उनके लिए मैं खुद को पूरी तरह लुटा देता हूँ ❤️
+        </div>
+    </div>
+
+    <div id="video-overlay">
+        <div class="close-btn" onclick="closeVideo()">&times;</div>
+        <video id="mainVideo" controls>
+            <source id="videoSrc" src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <script>
+        // 1. THREE.JS BACKGROUND
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bg'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.position.z = 30;
+
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 60, 12);
+        const material = new THREE.PointsMaterial({ size: 0.15, color: 0xffd700 });
+        const torusKnot = new THREE.Points(geometry, material);
+        scene.add(torusKnot);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            torusKnot.rotation.x += 0.003;
+            torusKnot.rotation.y += 0.003;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 2. LOGIC FOR OVERLAYS
+        const music = document.getElementById('bgMusic');
+        const overlay = document.getElementById('message-overlay');
+        const vOverlay = document.getElementById('video-overlay');
+        const vPlayer = document.getElementById('mainVideo');
+        const vSource = document.getElementById('videoSrc');
+
+        function showMsg() {
+            overlay.style.display = 'flex';
+            if (music) music.play().catch(e => console.log("Music play blocked"));
+
+            gsap.fromTo(".hindi-line", 
+                { opacity: 0, y: 30 }, 
+                { opacity: 1, y: 0, duration: 0.8, stagger: 0.6, ease: "power2.out" }
+            );
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMsg() {
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 3. VIDEO FUNCTIONS
+        function playVideo(file) {
+            vSource.src = file;
+            vPlayer.load();
+            vOverlay.style.display = 'flex';
+            vPlayer.play();
+            if (music) music.pause(); // Stop background music during video
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideo() {
+            vOverlay.style.display = 'none';
+            vPlayer.pause();
+            if (music) music.play(); // Resume background music
+            document.body.style.overflow = 'auto';
+        }
+
+        // 4. SCROLL REVEAL
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray(".reveal").forEach((elem) => {
+            gsap.from(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                ease: "power4.out"
+            });
+        });
+
+        // 5. RESIZE HANDLER
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
